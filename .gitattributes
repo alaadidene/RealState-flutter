@@ -1,0 +1,14 @@
+# Convert all text files to use LF in the repo
+* text=auto
+
+# Node modules et fichiers binaires, ne pas toucher
+node_modules/* binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.dll binary
+*.so binary
+*.exe binary
+*.apk binary
+*.jar binary

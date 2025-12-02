@@ -1,0 +1,19 @@
+{
+  // Minimal local TS config to avoid depending on Expo's tsconfig.
+  // Expo may try to rewrite this file unless EXPO_NO_TYPESCRIPT_SETUP is set.
+  "compilerOptions": {
+    "strict": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "jsx": "react-native",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  // Keep includes minimal to prevent the TS server from scanning the whole RN project
+  // when you're primarily working on the Flutter app.
+  "include": [
+    "nativewind-env.d.ts",
+    "image.d.ts"
+  ]
+}

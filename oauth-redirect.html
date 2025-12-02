@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Redirecting…</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Noto Sans', 'Helvetica Neue', Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
+           margin: 0; padding: 2rem; color: #e5e7eb; background: #111827; }
+    .card { max-width: 600px; margin: 10vh auto; background: #1f2937; border-radius: 12px; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.35); }
+    h1 { margin: 0 0 0.5rem; font-size: 1.25rem; }
+    p { margin: 0.5rem 0; line-height: 1.5; }
+    a { color: #93c5fd; }
+    code { background: #111827; padding: 0.15rem 0.35rem; border-radius: 6px; }
+  </style>
+  <script>
+    (function () {
+      try {
+        const url = new URL(window.location.href);
+        const q = new URLSearchParams(url.search);
+        const f = new URLSearchParams(url.hash ? url.hash.substring(1) : "");
+        const secret = q.get("secret") || f.get("secret");
+        const userId = q.get("userId") || f.get("userId");
+
+        let target = "com.jsm.restate://oauth";
+        const qp = new URLSearchParams();
+        if (secret) qp.set("secret", secret);
+        if (userId) qp.set("userId", userId);
+        const qs = qp.toString();
+        if (qs) target += "?" + qs;
+
+        // Attempt to redirect into the app
+        window.location.replace(target);
+
+        // Fallback: show manual link if auto redirect fails
+        setTimeout(function () {
+          var link = document.getElementById("link");
+          var panel = document.getElementById("panel");
+          if (link && panel) {
+            link.textContent = target;
+            link.setAttribute("href", target);
+            panel.style.display = "block";
+          }
+        }, 1000);
+      } catch (e) {
+        console.error("Redirect error:", e);
+        var err = document.getElementById("error");
+        if (err) {
+          err.textContent = String(e);
+        }
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="card">
+    <h1>Redirecting to the app…</h1>
+    <p>If nothing happens automatically, tap the link below to open the app:</p>
+    <p id="panel" style="display:none"><a id="link" href="#">Open app</a></p>
+    <p><small>If you see this page, your OAuth was successful and we are sending you back into the app via the custom scheme <code>com.jsm.restate://oauth</code>.</small></p>
+    <p id="error" style="color:#fca5a5"></p>
+  </div>
+</body>
+</html>

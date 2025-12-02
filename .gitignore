@@ -1,0 +1,33 @@
+# Flutter / Dart
+build/
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+pubspec.lock
+ios/Flutter/Flutter.framework/
+
+# IDE / Editor
+.idea/
+.vscode/
+
+# Android
+android/.gradle/
+*.iml
+*.apk
+*.keystore
+
+# macOS / iOS
+*.xcworkspace
+Pods/
+DerivedData/
+
+# Node / React Native
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Misc
+*.log
+.DS_Store
+.env
