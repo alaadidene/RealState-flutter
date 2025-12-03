@@ -83,13 +83,13 @@ class NotificationDocument {
     required this.type,
     required this.title,
     required this.message,
+    required this.createdAt,
+    required this.updatedAt,
     this.data = const {},
     this.isRead = false,
     this.readAt,
     this.actionUrl,
     this.imageUrl,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
   factory NotificationDocument.fromJson(Map<String, dynamic> json) {
@@ -141,6 +141,8 @@ class NotificationPreferencesDocument {
   NotificationPreferencesDocument({
     required this.id,
     required this.userId,
+    required this.createdAt,
+    required this.updatedAt,
     this.emailEnabled = true,
     this.pushEnabled = true,
     this.propertyUpdates = true,
@@ -148,8 +150,6 @@ class NotificationPreferencesDocument {
     this.paymentUpdates = true,
     this.messages = true,
     this.marketingEmails = false,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
   factory NotificationPreferencesDocument.fromJson(Map<String, dynamic> json) {

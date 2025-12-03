@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../core/theme/app_theme.dart';
 
 class FilterChips extends StatelessWidget {
   final String? selectedFilter;
@@ -27,25 +26,37 @@ class FilterChips extends StatelessWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: filters.length,
-        separatorBuilder: (context, index) => const SizedBox(width: 8),
+        separatorBuilder: (context, index) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
           final filter = filters[index];
           final isSelected = selectedFilter == filter['value'];
 
-          return FilterChip(
-            label: Text(filter['label'] as String),
-            selected: isSelected,
-            onSelected: (selected) {
-              onFilterSelected(selected ? filter['value'] : null);
+          return GestureDetector(
+            onTap: () {
+              onFilterSelected(filter['value']);
             },
-            selectedColor: AppTheme.primary,
-            checkmarkColor: Colors.white,
-            backgroundColor: Colors.grey.shade100,
-            labelStyle: TextStyle(
-              color: isSelected ? Colors.white : AppTheme.grey500,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? const Color(0xFF0061FF)
+                    : const Color(0xFFF5F5F5),
+                borderRadius: BorderRadius.circular(20),
+                border: isSelected
+                    ? null
+                    : Border.all(
+                        color: const Color(0xFF0061FF).withValues(alpha: 0.2),
+                      ),
+              ),
+              child: Text(
+                filter['label'] as String,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isSelected ? Colors.white : const Color(0xFF1F2937),
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           );
         },
       ),

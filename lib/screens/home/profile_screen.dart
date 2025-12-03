@@ -8,7 +8,73 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(currentUserProvider);
+    final currentUser = ref.watch(currentUserProvider);
+
+    // Show login prompt if not authenticated (like React Native)
+    if (currentUser == null) {
+      return Scaffold(
+        body: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(40.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.person_outline,
+                    size: 80,
+                    color: Colors.grey[400],
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'Login Required',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1F2937),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'You need to sign in to view and manage your profile',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[600],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        context.push('/sign-in');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0061FF),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                      ),
+                      child: const Text(
+                        'Sign In',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -32,7 +98,7 @@ class ProfileScreen extends ConsumerWidget {
               radius: 60,
               backgroundColor: Theme.of(context).primaryColor,
               child: Text(
-                user?.name.substring(0, 2).toUpperCase() ?? 'U',
+                currentUser?.name.substring(0, 2).toUpperCase() ?? 'U',
                 style: const TextStyle(
                   fontSize: 32,
                   color: Colors.white,
@@ -44,14 +110,14 @@ class ProfileScreen extends ConsumerWidget {
 
             // User Name
             Text(
-              user?.name ?? 'User',
+              currentUser?.name ?? 'User',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 4),
 
             // User Email
             Text(
-              user?.email ?? 'email@example.com',
+              currentUser?.email ?? 'email@example.com',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 32),
@@ -70,7 +136,7 @@ class ProfileScreen extends ConsumerWidget {
               icon: Icons.home_work_outlined,
               title: 'My Listings',
               onTap: () {
-                // Navigate to my listings
+                context.push('/my-listings');
               },
             ),
             _buildMenuItem(
@@ -103,6 +169,14 @@ class ProfileScreen extends ConsumerWidget {
               title: 'Notifications',
               onTap: () {
                 context.push('/notifications');
+              },
+            ),
+            _buildMenuItem(
+              context,
+              icon: Icons.settings_outlined,
+              title: 'Notification Preferences',
+              onTap: () {
+                context.push('/notification-preferences');
               },
             ),
             _buildMenuItem(

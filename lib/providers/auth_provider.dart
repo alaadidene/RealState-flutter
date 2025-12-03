@@ -43,7 +43,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final user = await _appwriteService.getCurrentUser();
       state = state.copyWith(user: user, isLoading: false);
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      // Don't show error for guest users (401 unauthorized)
+      if (!e.toString().contains('401') && !e.toString().contains('unauthorized')) {
+        state = state.copyWith(isLoading: false, error: e.toString());
+      } else {
+        state = state.copyWith(isLoading: false);
+      }
     }
   }
 

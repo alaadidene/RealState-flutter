@@ -38,10 +38,10 @@ class PropertyDocument {
     required this.image,
     required this.gallery,
     required this.agentId,
-    this.rating = 0.0,
-    this.reviewsCount = 0,
     required this.createdAt,
     required this.updatedAt,
+    this.rating = 0.0,
+    this.reviewsCount = 0,
   });
 
   factory PropertyDocument.fromJson(Map<String, dynamic> json) {
@@ -111,11 +111,11 @@ class AgentDocument {
     required this.email,
     required this.phone,
     required this.avatar,
+    required this.createdAt,
+    required this.updatedAt,
     this.rating = 0.0,
     this.propertiesCount = 0,
     this.completedDeals = 0,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
   factory AgentDocument.fromJson(Map<String, dynamic> json) {
@@ -126,8 +126,8 @@ class AgentDocument {
       phone: (json['phone'] ?? '') as String,
       avatar: (json['avatar'] ?? '') as String,
       rating: ((json['rating'] ?? 0.0) as num).toDouble(),
-      propertiesCount: (json['propertiesCount'] ?? 0) as int,
-      completedDeals: (json['completedDeals'] ?? 0) as int,
+      propertiesCount: ((json['propertiesCount'] ?? 0) as num).toInt(),
+      completedDeals: ((json['completedDeals'] ?? 0) as num).toInt(),
       createdAt: DateTime.parse((json['\$createdAt'] ?? DateTime.now().toIso8601String()) as String),
       updatedAt: DateTime.parse((json['\$updatedAt'] ?? DateTime.now().toIso8601String()) as String),
     );
@@ -165,15 +165,15 @@ class ReviewDocument {
     required this.id,
     required this.propertyId,
     required this.userId,
-    this.userName,
-    this.userAvatar,
     required this.rating,
     required this.comment,
+    required this.createdAt,
+    required this.updatedAt,
+    this.userName,
+    this.userAvatar,
     this.images = const [],
     this.verified = false,
     this.verifiedAt,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
   factory ReviewDocument.fromJson(Map<String, dynamic> json) {

@@ -97,6 +97,11 @@ class BookingDocument {
   final DateTime? cancelledAt;
   final DateTime createdAt;
   final DateTime updatedAt;
+  
+  // Populated relationships (not stored in DB, fetched separately)
+  final Map<String, dynamic>? property;
+  final Map<String, dynamic>? agent;
+  final Map<String, dynamic>? guest;
 
   BookingDocument({
     required this.id,
@@ -113,13 +118,16 @@ class BookingDocument {
     required this.totalPrice,
     required this.status,
     required this.paymentStatus,
+    required this.createdAt,
+    required this.updatedAt,
     this.specialRequests,
     this.rejectionReason,
     this.cancelledBy,
     this.confirmedAt,
     this.cancelledAt,
-    required this.createdAt,
-    required this.updatedAt,
+    this.property,
+    this.agent,
+    this.guest,
   });
 
   factory BookingDocument.fromJson(Map<String, dynamic> json) {
@@ -170,6 +178,40 @@ class BookingDocument {
       'cancelledAt': cancelledAt?.toIso8601String(),
     };
   }
+
+  // Copy with method to add populated relationships
+  BookingDocument copyWith({
+    Map<String, dynamic>? property,
+    Map<String, dynamic>? agent,
+    Map<String, dynamic>? guest,
+  }) {
+    return BookingDocument(
+      id: id,
+      propertyId: propertyId,
+      guestId: guestId,
+      agentId: agentId,
+      checkInDate: checkInDate,
+      checkOutDate: checkOutDate,
+      numberOfGuests: numberOfGuests,
+      numberOfNights: numberOfNights,
+      pricePerNight: pricePerNight,
+      subtotal: subtotal,
+      serviceFee: serviceFee,
+      totalPrice: totalPrice,
+      status: status,
+      paymentStatus: paymentStatus,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      specialRequests: specialRequests,
+      rejectionReason: rejectionReason,
+      cancelledBy: cancelledBy,
+      confirmedAt: confirmedAt,
+      cancelledAt: cancelledAt,
+      property: property ?? this.property,
+      agent: agent ?? this.agent,
+      guest: guest ?? this.guest,
+    );
+  }
 }
 
 // Payment Model
@@ -201,13 +243,13 @@ class PaymentDocument {
     required this.paymentGateway,
     required this.transactionId,
     required this.status,
+    required this.createdAt,
+    required this.updatedAt,
     this.receiptUrl,
     this.refundAmount,
     this.refundReason,
     this.refundedAt,
     this.gatewayResponse,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
   factory PaymentDocument.fromJson(Map<String, dynamic> json) {

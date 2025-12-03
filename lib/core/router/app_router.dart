@@ -6,7 +6,7 @@ import '../../screens/home/home_screen.dart';
 import '../../screens/home/explore_screen.dart';
 import '../../screens/home/favorites_screen.dart';
 import '../../screens/home/profile_screen.dart';
-import '../../screens/property/property_details_screen.dart';
+import '../../screens/property/property_details_screen_new.dart';
 import '../../screens/property/create_property_screen.dart';
 import '../../screens/bookings/bookings_screen.dart';
 import '../../screens/bookings/booking_requests_screen.dart';
@@ -24,23 +24,12 @@ final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);
 
   return GoRouter(
-    initialLocation: '/sign-in',
+    initialLocation: '/',
     debugLogDiagnostics: true,
+    // No redirect logic - allow all routes in guest mode
+    // Individual screens will handle showing login UI if needed
     redirect: (context, state) {
-      final isAuthenticated = authState.isAuthenticated;
-      final isSignInRoute = state.matchedLocation == '/sign-in';
-
-      // If not authenticated and not on sign-in page, redirect to sign-in
-      if (!isAuthenticated && !isSignInRoute) {
-        return '/sign-in';
-      }
-
-      // If authenticated and on sign-in page, redirect to home
-      if (isAuthenticated && isSignInRoute) {
-        return '/';
-      }
-
-      return null; // No redirect needed
+      return null; // No automatic redirects
     },
     routes: [
       // Auth Routes
@@ -92,7 +81,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'property-details',
         builder: (context, state) {
           final propertyId = state.pathParameters['id']!;
-          return PropertyDetailsScreen(propertyId: propertyId);
+          return PropertyDetailsScreenNew(propertyId: propertyId);
         },
       ),
 
@@ -102,7 +91,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'legacy-property-details',
         builder: (context, state) {
           final propertyId = state.pathParameters['id']!;
-          return PropertyDetailsScreen(propertyId: propertyId);
+          return PropertyDetailsScreenNew(propertyId: propertyId);
         },
       ),
 
@@ -110,6 +99,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/create-property',
         name: 'create-property',
         builder: (context, state) => const CreatePropertyScreen(),
+      ),
+
+      GoRoute(
+        path: '/create-property/:id',
+        name: 'edit-property',
+        builder: (context, state) {
+          final propertyId = state.pathParameters['id'];
+          return CreatePropertyScreen(propertyId: propertyId);
+        },
       ),
 
       // Map View

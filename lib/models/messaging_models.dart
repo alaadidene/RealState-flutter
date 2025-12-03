@@ -15,13 +15,13 @@ class ConversationDocument {
   ConversationDocument({
     required this.id,
     required this.participantIds,
-    this.lastMessage,
     required this.lastMessageSender,
+    required this.createdAt,
+    required this.updatedAt,
+    this.lastMessage,
     this.lastMessageTime,
     this.unreadCount = 0,
     this.type = 'direct',
-    required this.createdAt,
-    required this.updatedAt,
   });
 
   factory ConversationDocument.fromJson(Map<String, dynamic> json) {
@@ -74,6 +74,8 @@ class MessageDocument {
     required this.conversationId,
     required this.senderId,
     required this.receiverId,
+    required this.createdAt,
+    required this.updatedAt,
     this.content,
     this.contentType = 'text',
     this.imageUrl,
@@ -84,8 +86,6 @@ class MessageDocument {
     this.deliveredAt,
     this.isDeleted = false,
     this.deletedBy,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
   factory MessageDocument.fromJson(Map<String, dynamic> json) {
@@ -142,10 +142,10 @@ class TypingStatusDocument {
     required this.id,
     required this.conversationId,
     required this.userId,
-    this.isTyping = false,
-    this.timestamp,
     required this.createdAt,
     required this.updatedAt,
+    this.isTyping = false,
+    this.timestamp,
   });
 
   factory TypingStatusDocument.fromJson(Map<String, dynamic> json) {

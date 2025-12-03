@@ -31,36 +31,66 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: _controller,
-      decoration: InputDecoration(
-        hintText: 'Search properties...',
-        prefixIcon: const Icon(Icons.search),
-        suffixIcon: _controller.text.isNotEmpty
-            ? IconButton(
-                icon: const Icon(Icons.clear),
-                onPressed: () {
-                  _controller.clear();
-                  widget.onSearch('');
-                  setState(() {});
-                },
-              )
-            : null,
-        filled: true,
-        fillColor: Colors.grey.shade100,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFF0061FF).withValues(alpha: 0.1),
         ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      onSubmitted: widget.onSearch,
-      onChanged: (value) {
-        setState(() {});
-      },
+      child: TextField(
+        controller: _controller,
+        decoration: InputDecoration(
+          hintText: 'Search by name, type or location...',
+          hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14,
+          ),
+          prefixIcon: const Icon(
+            Icons.search,
+            color: Color(0xFF0061FF),
+            size: 20,
+          ),
+          suffixIcon: _controller.text.isNotEmpty
+              ? IconButton(
+                  icon: const Text(
+                    '×',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  onPressed: () {
+                    _controller.clear();
+                    widget.onSearch('');
+                    setState(() {});
+                  },
+                )
+              : null,
+          filled: false,
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
+        ),
+        onSubmitted: widget.onSearch,
+        onChanged: (value) {
+          widget.onSearch(value);
+          setState(() {});
+        },
+      ),
     );
   }
 }

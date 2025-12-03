@@ -23,31 +23,52 @@ class PropertyCard extends ConsumerWidget {
       onTap: () {
         context.push('/property/${property.id}');
       },
-      child: Card(
-        clipBehavior: Clip.antiAlias,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0x0F172A).withValues(alpha: 0.08),
+              offset: const Offset(0, 12),
+              blurRadius: 16,
+              spreadRadius: 0,
+            ),
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Property Image
-            Stack(
-              children: [
-                AspectRatio(
-                  aspectRatio: 4 / 3,
-                  child: CachedNetworkImage(
-                    imageUrl: property.image,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: AppTheme.grey100,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    ),
-                    errorWidget: (context, url, error) => Container(
-                      color: AppTheme.grey100,
-                      child: const Icon(Icons.image_not_supported),
-                    ),
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              ),
+              child: Stack(
+                children: [
+                  AspectRatio(
+                    aspectRatio: 4 / 3,
+                    child: property.image.isEmpty
+                        ? Container(
+                            color: AppTheme.grey100,
+                            child: const Icon(Icons.image_not_supported, size: 40),
+                          )
+                        : CachedNetworkImage(
+                            imageUrl: property.image,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Container(
+                              color: AppTheme.grey100,
+                              child: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              color: AppTheme.grey100,
+                              child: const Icon(Icons.image_not_supported, size: 40),
+                            ),
+                          ),
                   ),
-                ),
 
                 // Category Badge
                 Positioned(
@@ -106,7 +127,8 @@ class PropertyCard extends ConsumerWidget {
                     ),
                   ),
                 ),
-              ],
+                ],
+              ),
             ),
 
             // Property Info
@@ -162,16 +184,38 @@ class PropertyCard extends ConsumerWidget {
                         _buildFeature(Icons.square_foot_outlined, '${property.area}'),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
 
-                    // Price
-                    Text(
-                      '\$${property.price.toStringAsFixed(0)}${property.category == 'rent' ? '/mo' : ''}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: AppTheme.primary,
-                      ),
+                    // Price with per night text and arrow
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '\$${property.price.toStringAsFixed(0)}',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF0061FF),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              'per night',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.arrow_forward,
+                              size: 16,
+                              color: Colors.grey[600],
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ],
                 ),

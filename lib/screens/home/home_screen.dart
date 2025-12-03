@@ -5,6 +5,7 @@ import '../../providers/properties_provider.dart';
 import '../../widgets/property_card.dart';
 import '../../widgets/search_bar_widget.dart';
 import '../../widgets/filter_chips.dart';
+import '../../widgets/featured_carousel.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -17,44 +18,103 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final propertiesState = ref.watch(propertiesProvider);
+    final latestPropertiesAsync = ref.watch(latestPropertiesProvider);
     final currentUser = ref.watch(currentUserProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Welcome back,',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            Text(
-              currentUser?.name ?? 'User',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {
-              context.push('/notifications');
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.message_outlined),
-            onPressed: () {
-              context.push('/messages');
-            },
-          ),
-        ],
-      ),
       body: RefreshIndicator(
         onRefresh: () async {
           await ref.read(propertiesProvider.notifier).refresh();
+          ref.invalidate(latestPropertiesProvider);
         },
         child: CustomScrollView(
           slivers: [
+            // App Bar
+            SliverAppBar(
+              floating: true,
+              title: GestureDetector(
+                onTap: () {
+                  context.push('/profile');
+                },
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: const Color(0xFF0061FF).withValues(alpha: 0.1),
+                      child: Text(
+                        currentUser?.name != null && currentUser!.name.isNotEmpty
+                            ? currentUser.name.substring(0, 1).toUpperCase()
+                            : 'U',
+                        style: const TextStyle(
+                          color: Color(0xFF0061FF),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Good Morning',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        Text(
+                          currentUser?.name ?? 'User',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.notifications_outlined),
+                      onPressed: () {
+                        context.push('/notifications');
+                      },
+                    ),
+                    // Notification Badge
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: const Text(
+                          '3',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
             // Search Bar
             SliverToBoxAdapter(
               child: Padding(
@@ -66,6 +126,74 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
             ),
+
+            // Featured Section Header
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Featured',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        context.go('/explore');
+                      },
+                      child: const Text(
+                        'See All',
+                        style: TextStyle(
+                          color: Color(0xFF0061FF),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Featured Carousel
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: latestPropertiesAsync.when(
+                  loading: () => const SizedBox(
+                    height: 280,
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                  error: (error, stack) => SizedBox(
+                    height: 280,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                          const SizedBox(height: 8),
+                          Text('Error loading featured properties'),
+                        ],
+                      ),
+                    ),
+                  ),
+                  data: (properties) {
+                    if (properties.isEmpty) {
+                      return const SizedBox(
+                        height: 280,
+                        child: Center(child: Text('No featured properties')),
+                      );
+                    }
+                    return FeaturedCarousel(properties: properties);
+                  },
+                ),
+              ),
+            ),
+
+            const SliverToBoxAdapter(child: SizedBox(height: 24)),
 
             // Filter Chips
             SliverToBoxAdapter(
@@ -82,28 +210,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
             const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
-            // Section Header
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Featured Properties',
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        context.go('/explore');
-                      },
-                      child: const Text('See All'),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
             // Properties Grid
             if (propertiesState.isLoading)
               const SliverFillRemaining(
@@ -117,9 +223,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     children: [
                       const Icon(Icons.error_outline, size: 64, color: Colors.red),
                       const SizedBox(height: 16),
-                      Text(
+                      const Text(
                         'Error loading properties',
-                        style: Theme.of(context).textTheme.titleLarge,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(propertiesState.error!),
@@ -166,6 +275,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onPressed: () {
           context.push('/create-property');
         },
+        backgroundColor: const Color(0xFF0061FF),
         child: const Icon(Icons.add),
       ),
     );

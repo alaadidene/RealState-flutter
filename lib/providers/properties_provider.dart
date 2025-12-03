@@ -13,6 +13,12 @@ class PropertiesState {
   final String? error;
   final String? selectedFilter;
   final String? searchQuery;
+  final double? minPrice;
+  final double? maxPrice;
+  final int? minBeds;
+  final int? bathrooms;
+  final List<String>? facilities;
+  final String? sort;
 
   PropertiesState({
     this.properties = const [],
@@ -20,6 +26,12 @@ class PropertiesState {
     this.error,
     this.selectedFilter,
     this.searchQuery,
+    this.minPrice,
+    this.maxPrice,
+    this.minBeds,
+    this.bathrooms,
+    this.facilities,
+    this.sort,
   });
 
   PropertiesState copyWith({
@@ -28,6 +40,12 @@ class PropertiesState {
     String? error,
     String? selectedFilter,
     String? searchQuery,
+    double? minPrice,
+    double? maxPrice,
+    int? minBeds,
+    int? bathrooms,
+    List<String>? facilities,
+    String? sort,
   }) {
     return PropertiesState(
       properties: properties ?? this.properties,
@@ -35,6 +53,12 @@ class PropertiesState {
       error: error ?? this.error,
       selectedFilter: selectedFilter ?? this.selectedFilter,
       searchQuery: searchQuery ?? this.searchQuery,
+      minPrice: minPrice ?? this.minPrice,
+      maxPrice: maxPrice ?? this.maxPrice,
+      minBeds: minBeds ?? this.minBeds,
+      bathrooms: bathrooms ?? this.bathrooms,
+      facilities: facilities ?? this.facilities,
+      sort: sort ?? this.sort,
     );
   }
 }
@@ -50,15 +74,67 @@ class PropertiesNotifier extends StateNotifier<PropertiesState> {
   Future<void> loadProperties() async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final properties = await _appwriteService.getProperties(
+      var properties = await _appwriteService.getProperties(
         filter: state.selectedFilter,
         query: state.searchQuery,
-        limit: 20,
+        limit: 100,
       );
+
+      // Apply client-side filtering
+      properties = _applyFilters(properties);
+
       state = state.copyWith(properties: properties, isLoading: false);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
+  }
+
+  List<PropertyDocument> _applyFilters(List<PropertyDocument> properties) {
+    var filtered = properties;
+
+    // Price range
+    if (state.minPrice != null) {
+      filtered = filtered.where((p) => p.price >= state.minPrice!).toList();
+    }
+    if (state.maxPrice != null) {
+      filtered = filtered.where((p) => p.price <= state.maxPrice!).toList();
+    }
+
+    // Bedrooms
+    if (state.minBeds != null) {
+      filtered = filtered.where((p) => p.bedrooms >= state.minBeds!).toList();
+    }
+
+    // Bathrooms
+    if (state.bathrooms != null) {
+      filtered = filtered.where((p) => p.bathrooms >= state.bathrooms!).toList();
+    }
+
+    // Facilities
+    if (state.facilities != null && state.facilities!.isNotEmpty) {
+      filtered = filtered.where((p) {
+        return state.facilities!.every((f) => p.facilities.contains(f));
+      }).toList();
+    }
+
+    // Sort
+    switch (state.sort) {
+      case 'price_high':
+        filtered.sort((a, b) => b.price.compareTo(a.price));
+        break;
+      case 'price_low':
+        filtered.sort((a, b) => a.price.compareTo(b.price));
+        break;
+      case 'rating':
+        filtered.sort((a, b) => b.rating.compareTo(a.rating));
+        break;
+      case 'newest':
+      default:
+        filtered.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        break;
+    }
+
+    return filtered;
   }
 
   void setFilter(String? filter) {
@@ -68,6 +144,25 @@ class PropertiesNotifier extends StateNotifier<PropertiesState> {
 
   void setSearchQuery(String? query) {
     state = state.copyWith(searchQuery: query);
+    loadProperties();
+  }
+
+  void setAdvancedFilters({
+    double? minPrice,
+    double? maxPrice,
+    int? minBeds,
+    int? bathrooms,
+    List<String>? facilities,
+    String? sort,
+  }) {
+    state = state.copyWith(
+      minPrice: minPrice,
+      maxPrice: maxPrice,
+      minBeds: minBeds,
+      bathrooms: bathrooms,
+      facilities: facilities,
+      sort: sort,
+    );
     loadProperties();
   }
 
@@ -99,8 +194,14 @@ final propertyReviewsProvider =
 
 // Agents Provider
 final agentsProvider = FutureProvider<List<AgentDocument>>((ref) async {
+  // TODO: Implement getAgents method
+  return [];
+});
+
+// Latest Properties Provider (for featured carousel)
+final latestPropertiesProvider = FutureProvider<List<PropertyDocument>>((ref) async {
   final appwriteService = ref.watch(appwriteServiceProvider);
-  return await appwriteService.getAgents();
+  return await appwriteService.getProperties(limit: 5);
 });
 
 // Agent by ID Provider
